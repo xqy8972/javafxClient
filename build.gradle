@@ -1,0 +1,30 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '2.0.4'
+}
+
+group 'com.xiot'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "io.vertx:vertx-core:3.8.4"
+    compile "io.vertx:vertx-config:3.8.4"
+    compile "io.vertx:vertx-web:3.8.4"
+    testCompile "io.vertx:vertx-junit5:3.8.4"
+    compile "cn.geekcity.xiot:xiot-support-utils:0.54.3-SNAPSHOT"
+    compile "cn.geekcity.xiot:xiot-spec-codec-vertx:0.54.3-SNAPSHOT"
+    compile "cn.geekcity.xiot:xiot-spec-codec-generic:0.54.3-SNAPSHOT"
+    compile "cn.geekcity.xiot:xiot-config-spi-acm:0.54.3-SNAPSHOT"
+    compile "org.slf4j:slf4j-api:1.7.25"
+    compile "commons-io:commons-io:2.4"
+    compile "ch.qos.logback:logback-classic:1.2.3"
+    compile "org.json:json:20160810"
+
+}

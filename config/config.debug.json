@@ -1,0 +1,8 @@
+{
+  "cors": true,
+  "port": 8008,
+  "device-instance": {
+    "host": "st-iot-spec.knowin.com",
+    "port": 80
+  }
+}
