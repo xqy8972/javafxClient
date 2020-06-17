@@ -1,5 +1,5 @@
-package VerticleService.img;
-import VerticleService.DeviceListService;
+package NetService.Impl;
+import NetService.DeviceListService;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
@@ -18,7 +18,11 @@ public class DeviceListServiceImp implements DeviceListService {
 	//设置最长空余时间
 	private static final int DEFAULT_IDLE_TIMEOUT = 3;
 
-	public DeviceListServiceImp(Vertx vertx, JsonObject config){
+	private String token;
+
+	public DeviceListServiceImp(Vertx vertx, JsonObject config, String token){
+		this.token = token;
+		System.out.println(token);
 		WebClientOptions options = new WebClientOptions();
 		options.setSsl(false);
 		options.setUserAgent("controller/1.0");
@@ -34,8 +38,8 @@ public class DeviceListServiceImp implements DeviceListService {
 	@Override
 	public Future<JsonObject> getMessage() {
 		Promise<JsonObject> promise = Promise.promise();
-		client.get("/simulator/instances")
-				.bearerTokenAuthentication("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjIyIiwiZXhwaXJlc0luIjo4NjQwMCwiaWF0IjoxNTkxODY4OTY1LCJleHAiOjE1OTE5NTUzNjV9.f51UkQvL8ov-oNOun7ox7IY868_cy6ztEAkS5HlNmCk")
+		client.getAbs("http://dev-iot-dvlp.knowin.com/simulator/instances")
+				.bearerTokenAuthentication(token)
 				.send(ar->{
 					if (ar.succeeded()){
 						HttpResponse<Buffer> result = ar.result();
@@ -44,6 +48,7 @@ public class DeviceListServiceImp implements DeviceListService {
 						ar.failed();
 					}
 				});
+
 		return promise.future();
 	}
 }

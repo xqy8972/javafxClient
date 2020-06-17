@@ -1,3 +1,5 @@
+package Utils;
+
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -35,15 +37,14 @@ public class RoundIcon extends Pane {
 	/**
 	 *
 	 */
-	public void update()
-	{
+	public void update(){
+
 		if(image == null) return;
 
 		// 窗口大小
 		double w = getWidth();
 		double h = getHeight();
 		if(w<=0 || h <=0) return;
-		System.out.println("w" + w + ",h=" + h);
 
 		// 图片的大小
 		double imgw = image.getWidth();
@@ -76,8 +77,7 @@ public class RoundIcon extends Pane {
 	}
 
 	// 画图
-	private void drawImage(GraphicsContext gc, Image image, Rectangle2D r)
-	{
+	private void drawImage(GraphicsContext gc, Image image, Rectangle2D r){
 		gc.drawImage(image,
 				0, 0, image.getWidth(), image.getHeight(),
 				r.getMinX(), r.getMinY(), r.getWidth(),r.getHeight()

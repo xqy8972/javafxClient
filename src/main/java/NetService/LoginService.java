@@ -1,15 +1,18 @@
-package VerticleService;
+package NetService;
 
-import VerticleService.img.LoginServiceImpl;
+import NetService.Impl.LoginServiceImpl;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 
-public interface ClientService {
+import java.util.Map;
 
-	static ClientService createLoginService(Vertx vertx, JsonObject config){
+public interface LoginService {
+
+	static LoginService createLoginService(Vertx vertx, JsonObject config){
 		return new LoginServiceImpl(vertx,config);
 	}
 
-	Future<JsonObject> getMessage();
+	Future<Map<String, Object>> getMessage(String username, String password);
+
 }

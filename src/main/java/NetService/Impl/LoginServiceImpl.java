@@ -1,16 +1,18 @@
-package VerticleService.img;
+package NetService.Impl;
 
-import VerticleService.ClientService;
+import NetService.LoginService;
+import domain.User;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
-import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
 
-public class LoginServiceImpl implements ClientService {
+import java.util.HashMap;
+import java.util.Map;
+
+public class LoginServiceImpl implements LoginService {
 
 	private WebClient client;
 
@@ -28,22 +30,65 @@ public class LoginServiceImpl implements ClientService {
 		options.setKeepAlive(true);
 		options.setDefaultHost(config.getString("host", "127.0.0.1"));
 		options.setDefaultPort(config.getInteger("port", 8080));
+		options.setFollowRedirects(false);
 		//创建客户端
 		this.client = WebClient.create(vertx, options);
 	}
 
 	@Override
-	public Future<JsonObject> getMessage() {
-		Promise<JsonObject> promise = Promise.promise();
-		client.get("/v1/login")
-				.send(ar->{
-					if (ar.succeeded()){
-						HttpResponse<Buffer> result = ar.result();
-						promise.complete(result.bodyAsJsonObject());
-					}else{
-						ar.failed();
+	public Future<Map<String, Object>> getMessage(String username, String password) {
+		Promise<Map<String, Object>> promise = Promise.promise();
+
+		JsonObject jsonObject = new JsonObject();
+		jsonObject.put("username",username);
+		jsonObject.put("password",password);
+		client.postAbs("https://dev-iot-account.knowin.com/v1/login")
+				.sendJsonObject(jsonObject,ar->{
+					if (ar.failed()){
+						ar.cause().printStackTrace();
+						promise.fail("LoginService_getMessage error: " + ar.cause());
+						return;
 					}
+					JsonObject o = ar.result().bodyAsJsonObject();
+					String msg = o.getString("msg");
+
+					Map<String,Object> map = new HashMap<>();
+					if ("ok".equals(msg)){
+						JsonObject data = o.getJsonObject("data");
+						String token = data.getString("token");
+
+						User user = new User();
+						user.setName(data.getString("name"))
+								.setEmail(data.getString("email"))
+								.setUid(data.getInteger("uid"))
+								.setAvatar(data.getString("avatar"));
+
+						map.put("user",user);
+						map.put("token",token);
+						map.put("msg","ok");
+					}else{
+						map.put("msg","error");
+						map.put("description", o.getString("description"));
+					}
+					promise.complete(map);
 				});
+
 		return promise.future();
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

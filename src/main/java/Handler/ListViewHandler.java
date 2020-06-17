@@ -1,7 +1,7 @@
 package Handler;
 
 import Utils.DecodeUtils;
-import VerticleService.DeviceListService;
+import NetService.DeviceListService;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;

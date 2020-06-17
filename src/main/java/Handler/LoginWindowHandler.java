@@ -1,5 +1,9 @@
 package Handler;
 
+import Handler.windows.ErrorWindow;
+import NetService.Impl.LoginServiceImpl;
+import NetService.LoginService;
+import domain.User;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import javafx.application.Platform;
@@ -16,6 +20,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.apache.commons.codec.digest.DigestUtils;
+
+import java.util.Map;
 
 public class LoginWindowHandler {
 
@@ -65,7 +72,7 @@ public class LoginWindowHandler {
 
 		HBox header = new HBox();
 		header.setPrefHeight(100);
-		Image image = new Image("/img/headerImg.png");
+		Image image = new Image("/img/header.png");
 		ImageView imageView = new ImageView(image);
 		header.setAlignment(Pos.CENTER);
 		header.getChildren().add(imageView);
@@ -78,7 +85,6 @@ public class LoginWindowHandler {
 		Scene scene = new Scene(root);
 		scene.getStylesheets().add(LoginWindowHandler.class.getResource("/Login.css").toExternalForm());
 
-
 		Platform.runLater(()->{
 			stage.setScene(scene);
 			stage.setWidth(600);
@@ -89,24 +95,49 @@ public class LoginWindowHandler {
 		});
 
 		login.setOnAction((e)->{
+			String username = t_username.getText();
 			String password = p_password.getText();
+			String md5_password = DigestUtils.md5Hex(password);
 
+			JsonObject instance = new JsonObject();
+			instance.put("host","dev-Iot-account.knowin.com");
+			instance.put("port",80);
 
+			LoginService loginService = new LoginServiceImpl(vertx,instance);
 
-			if (password.equals("123")){
-				JsonObject instance = new JsonObject();
-				instance.put("host","dev-iot-dvlp.knowin.com");
-				instance.put("port",80);
+			loginService.getMessage(username, md5_password).setHandler(ar->{
+				if (ar.succeeded()){
+					Map<String, Object> map = ar.result();
+					String msg = (String)map.get("msg");
+					if("ok".equals(msg)){
+						JsonObject mainInstance = new JsonObject();
+						mainInstance.put("host","dev-iot-dvlp.knowin.com");
+						mainInstance.put("port",80);
 
-				Platform.runLater(()->{
-					stage.close();
-				});
-				new InitRenderHandler(stage,vertx,instance).initLoading();
-			}
+						Platform.runLater(()->{
+							stage.close();
+						});
+
+						User user = (User)map.get("user");
+						String token = (String)map.get("token");
+						InitRenderHandler initRenderHandler = new InitRenderHandler(stage, vertx, mainInstance, user, token);
+						initRenderHandler.initLoading();
+					}else{
+						Platform.runLater(()->{
+							ErrorWindow errorWindow = new ErrorWindow(stage);
+							errorWindow.resize(300,100);
+							errorWindow.setResizable(false);
+							errorWindow.show();
+							errorWindow.centerInParent();
+						});
+					}
+				}else{
+					System.out.println(ar.cause());
+				}
+
+			});
 		});
-
 	}
-
 }
 
 

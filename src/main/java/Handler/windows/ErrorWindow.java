@@ -1,4 +1,4 @@
-package Handler;
+package Handler.windows;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
